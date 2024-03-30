@@ -1,5 +1,8 @@
 <script setup>
 import { ref } from "vue";
+import AppHeader from "./components/AppHeader"
+import AppFooter from "./components/AppFooter.vue"
+
 const test = ref(0);
 const userInputTask = ref("");
 const userIncompleteTasks = ref([]);
@@ -34,6 +37,8 @@ const taskReturn = (index) => {
 </script>
 
 <template>
+  <AppHeader />
+  <RouterView />
   <h1>Hello,World!</h1>
   <h2>{{ test }}</h2>
   <button @click="add">+1</button><br />
@@ -50,6 +55,10 @@ const taskReturn = (index) => {
     <button @click="taskReturn(index)">戻す</button>
     <button @click="completeTaskDelete(index)">削除</button>
   </li>
+  <br />
+  <br />
+  <br />  <br />  <br />  <br />  <br />  <br />  <br />  <br />  <br />  <br />  <br />  <br />  <br />
+  <AppFooter />
 </template>
 
 <style scoped></style>
