@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-
+const baseUrl = process.env.VUE_APP_URL
 const naviText = ref("")
 const mouseOver = (text) => {
     naviText.value = text
@@ -13,19 +13,19 @@ const mouseOver = (text) => {
 <template>
     <header>
         <div>
-            <RouterLink to = "/">
+            <RouterLink :to = "`${baseUrl}/`">
                 <img class="logo-pc" src="../images/logo-pc.png" alt="ロゴ">
             </RouterLink>
-            <RouterLink to = "/login">
+            <RouterLink :to = "`${baseUrl}/login`">
                 <img class="iconimage" @mouseover="() => mouseOver('ログイン')" @mouseleave="() => mouseOver('')" src="../images/signin.png" alt="ログインアイコン">
             </RouterLink>
-            <RouterLink to = "/">
+            <RouterLink :to = "`${baseUrl}/`">
                 <img class="iconimage" src="../images/home.png" @mouseover="() => mouseOver('ホーム')" @mouseleave="() => mouseOver('')" alt="ホームアイコン">
             </RouterLink>
-            <RouterLink to = "/userprofile">
+            <RouterLink :to = "`${baseUrl}/userprofile`">
                 <img class="iconimage" src="../images/usericon.png" @mouseover="() => mouseOver('プロフィール')" @mouseleave="() => mouseOver('')" alt="設定アイコン">
             </RouterLink>
-            <RouterLink to = "/about">
+            <RouterLink :to = "`${baseUrl}/about`">
                 <img class="iconimage" src="../images/breadadd.png" @mouseover="() => mouseOver('テスト')" @mouseleave="() => mouseOver('')" alt="設定アイコン">
             </RouterLink>
         </div>
