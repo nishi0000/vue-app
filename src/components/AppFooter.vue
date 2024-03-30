@@ -7,7 +7,7 @@
 
 <style scoped>
 footer {
-    background-color: aqua;
+    background-color: #083d82;
     height: 80px;
 }
 </style>
