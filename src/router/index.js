@@ -4,27 +4,24 @@ import AppAbout from '../pages/AppAbout.vue'
 import AppLogIn from '../pages/AppLogIn.vue'
 import UserProfile from '../pages/UserProfile.vue'
 
-const baseUrl = process.env.VUE_APP_URL
-
-
 const router = createRouter({
     history: createWebHashHistory(),
     routes:[
         {
-            path:`${baseUrl}/`,
+            path:`/`,
             component: AppHome
 
         },
         {
-            path:`${baseUrl}/about`,
+            path:`/about`,
             component: AppAbout
         },
         {
-            path:`${baseUrl}/login`,
+            path:`/login`,
             component: AppLogIn
         },
         {
-            path:`${baseUrl}/userprofile`,
+            path:`/userprofile`,
             component: UserProfile
         }
     ]
