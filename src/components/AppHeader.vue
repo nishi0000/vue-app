@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from "vue";
-const baseUrl = process.env.VUE_APP_URL
 const naviText = ref("")
 const mouseOver = (text) => {
     naviText.value = text
@@ -10,19 +9,19 @@ const mouseOver = (text) => {
 <template>
     <header>
         <div>
-            <RouterLink :to = "`${baseUrl}/`">
+            <RouterLink :to = "`/`">
                 <img class="logo-pc" src="../images/logo-pc.png" alt="ロゴ">
             </RouterLink>
-            <RouterLink :to = "`${baseUrl}/login`">
+            <RouterLink :to = "`/login`">
                 <img class="iconimage" @mouseover="() => mouseOver('ログイン')" @mouseleave="() => mouseOver('')" src="../images/signin.png" alt="ログインアイコン">
             </RouterLink>
-            <RouterLink :to = "`${baseUrl}/`">
+            <RouterLink :to = "`/`">
                 <img class="iconimage" src="../images/home.png" @mouseover="() => mouseOver('ホーム')" @mouseleave="() => mouseOver('')" alt="ホームアイコン">
             </RouterLink>
-            <RouterLink :to = "`${baseUrl}/userprofile`">
+            <RouterLink :to = "`/userprofile`">
                 <img class="iconimage" src="../images/usericon.png" @mouseover="() => mouseOver('プロフィール')" @mouseleave="() => mouseOver('')" alt="設定アイコン">
             </RouterLink>
-            <RouterLink :to = "`${baseUrl}/about`">
+            <RouterLink :to = "`/about`">
                 <img class="iconimage" src="../images/breadadd.png" @mouseover="() => mouseOver('テスト')" @mouseleave="() => mouseOver('')" alt="設定アイコン">
             </RouterLink>
         </div>
