@@ -5,9 +5,6 @@ const naviText = ref("")
 const mouseOver = (text) => {
     naviText.value = text
 }
-
-
-
 </script>
 
 <template>
