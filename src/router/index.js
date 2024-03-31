@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import AppHome from '../pages/AppHome.vue'
 import AppAbout from '../pages/AppAbout.vue'
 import AppLogIn from '../pages/AppLogIn.vue'
@@ -8,7 +8,7 @@ const baseUrl = process.env.VUE_APP_URL
 
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes:[
         {
             path:`${baseUrl}/`,
