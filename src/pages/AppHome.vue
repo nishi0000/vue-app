@@ -7,7 +7,7 @@ const loading = ref(true); // ローディング状態を管理するリファ�
 const data = ref([])
 // ドキュメントを取得して表示
 watchEffect(async () => {
-  const querySnapshot = await getDocs(collection(db, "colle"));
+  const querySnapshot = await getDocs(collection(db, "breadproduct"));
   data.value = querySnapshot.docs.map(doc => doc.data()); 
   console.log(data.value)
   loading.value = false
@@ -18,9 +18,12 @@ watchEffect(async () => {
 
     <h1>Home</h1>
     <div v-if="loading">Loading...</div>
-    <li v-for="data,index in data" :key="index">
-      {{ data }}
-    </li>
+    <ul v-for="data,index in data" :key="index">
+      <li>商品名:{{ data.breadName }} </li>
+      <li>お店の名前:{{ data.storeName }}</li>
+      <li>値段:{{ data.price }}</li>
+      <li>詳細:{{ data.detail }}</li>
+    </ul>
 
 
   <br />
