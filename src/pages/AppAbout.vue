@@ -1,10 +1,12 @@
 <script setup>
 import { ref } from "vue";
+import { useStoreCounter } from '../stores/counter';
 
 const test = ref(0);
 const userInputTask = ref("");
-const userIncompleteTasks = ref([]);
+const userIncompleteTasks = ref([])
 const userCompleteTasks = ref([])
+const counter = useStoreCounter()
 
 const add = (event) => {
   console.log(event.pageX);
@@ -41,6 +43,8 @@ const taskReturn = (index) => {
     <h1>Test</h1>
     <h1>Hello,World!</h1>
   <h2>{{ test }}</h2>
+  <h2>{{ counter.count}}</h2>
+  <button @click="counter.increment">Up</button>
   <button @click="add">+1</button><br />
   <input v-model="userInputTask" @keyup.enter="taskAdd" type="text"/><button @click="taskAdd">追加</button>
   <p>やることリスト</p>

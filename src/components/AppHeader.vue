@@ -1,9 +1,31 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watchEffect  } from "vue";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useAuth } from '../stores/user';
+
+const userProfile = useAuth()
 const naviText = ref("")
 const mouseOver = (text) => {
     naviText.value = text
 }
+
+watchEffect(async () => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log(user)
+    userProfile.$patch((state) => {
+    state.token = user.uid;
+  });
+  } else {
+
+    console.log(user)
+  }
+});
+    
+})
+
+
 </script>
 
 <template>
@@ -12,8 +34,11 @@ const mouseOver = (text) => {
             <RouterLink :to = "`/`">
                 <img class="logo-pc" src="../images/logo-pc.png" alt="ロゴ">
             </RouterLink>
-            <RouterLink :to = "`/login`">
+            <RouterLink :to = "`/login`" v-if="!userProfile.token">
                 <img class="iconimage" @mouseover="() => mouseOver('ログイン')" @mouseleave="() => mouseOver('')" src="../images/signin.png" alt="ログインアイコン">
+            </RouterLink>
+            <RouterLink :to = "`/login`" v-if="userProfile.token">
+                <img class="iconimage" @mouseover="() => mouseOver('ログアウト')" @mouseleave="() => mouseOver('')" src="../images/signout.png" alt="ログインアイコン">
             </RouterLink>
             <RouterLink :to = "`/`">
                 <img class="iconimage" src="../images/home.png" @mouseover="() => mouseOver('ホーム')" @mouseleave="() => mouseOver('')" alt="ホームアイコン">

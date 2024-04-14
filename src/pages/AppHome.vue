@@ -3,7 +3,7 @@ import { ref, watchEffect } from 'vue';
 import {db} from "../firebase_settings/index.js";
 import { collection, getDocs } from "firebase/firestore";
 
-const loading = ref(true); // ローディング状態を管理するリファレンス
+const loading = ref(true); 
 const data = ref([])
 // ドキュメントを取得して表示
 watchEffect(async () => {
