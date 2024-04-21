@@ -28,7 +28,8 @@ const onClickEyeIcon = () => {
 
 <template>
   <main>
-    <form action="">
+    <form>
+      <div class="maincontainer">
       <div class="container">
         <h2>ログイン画面</h2>
       </div>
@@ -57,6 +58,7 @@ const onClickEyeIcon = () => {
         <div><AppButton :onClick="onClickLogin">ログイン</AppButton></div>
         <div><AppButton :onClick="onClickLogin">新規登録</AppButton></div>
       </div>
+    </div>
     </form>
   </main>
 </template>
@@ -75,12 +77,18 @@ main {
 }
 
 h2 {
+  margin-top: 8px;
   font-weight: normal;
   font-size: 20px;
 }
 
 .container {
   text-align: center;
+}
+
+label {
+  display: block;
+  margin-top: 16px;
 }
 
 input {
