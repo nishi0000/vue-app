@@ -7,7 +7,7 @@ const loading = ref(true);
 const data = ref([])
 // ドキュメントを取得して表示
 watchEffect(async () => {
-  const querySnapshot = await getDocs(collection(db, "breadproduct"));
+  const querySnapshot = await getDocs(collection(db, "todo"));
   data.value = querySnapshot.docs.map(doc => doc.data()); 
   console.log(data.value)
   loading.value = false
@@ -16,12 +16,14 @@ watchEffect(async () => {
 
 <template>
 
-    <h1>Home</h1>
+    <h1>ToDoList</h1>
+    <p>A / B / C / D</p>
+    <p>すべて / 回答が必要 / 返事待ち / 完了</p>
     <div v-if="loading">Loading...</div>
     <ul v-for="data,index in data" :key="index">
-      <li>商品名:{{ data.breadName }} </li>
-      <li>お店の名前:{{ data.storeName }}</li>
-      <li>値段:{{ data.price }}</li>
+      <li>チーム{{data.team}} ステータス:{{ data.status }} 担当者:{{ data.pic }}</li>
+      <li>メール件名:{{ data.subject }} </li>
+      <li>日付:{{ data.date }} 〇日前</li>
       <li>詳細:{{ data.detail }}</li>
     </ul>
 

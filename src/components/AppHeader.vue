@@ -96,6 +96,15 @@ const onClickModalWindow = () => {
           alt="設定アイコン"
         />
       </RouterLink>
+      <RouterLink :to="`/createtodo`">
+        <img
+          class="iconimage"
+          src="../images/createdata.png"
+          @mouseover="() => mouseOver('タスク追加')"
+          @mouseleave="() => mouseOver('')"
+          alt="データ追加アイコン"
+        />
+      </RouterLink>
     </div>
     <div class="navitext">{{ naviText }}</div>
     <AppModalWindow
