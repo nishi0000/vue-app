@@ -18,8 +18,8 @@ watchEffect(async () => {
   <main>
     <div class="title-container">
       <h1>ToDoList</h1>
-      <p>A / B / C / D</p>
-      <p>すべて / 回答が必要 / 返事待ち / 完了</p>
+      <p>すべて / A / B / C / D</p>
+      <p>すべて / 対応中 （ 未回答 / 返事待ち ） / 完了</p>
     </div>
 
     <div v-if="loading">Loading...</div>
@@ -32,10 +32,12 @@ watchEffect(async () => {
         <div class="tag">{{ data.process }}</div>
       </div>
       <div class="mail-container">
-        <div class="mail-title">メール件名:{{ data.subject }} </div>
-        <div>日付:{{ data.date }}</div>
-        <div>〇日前</div>
-        <div class="detail-container">詳細:{{ data.detail }}</div>
+        <div class="mail-title">{{ data.subject }} </div>
+        <div class="detail-container">{{ data.detail }}</div>
+        <div class="date-container">
+          <div class="date-detail">{{data.date }}</div>
+          <div class="date-detail">〇日前</div>
+        </div>
       </div>
     </div>
 
@@ -65,8 +67,26 @@ watchEffect(async () => {
   gap: 8px;
 }
 
+.date-container {  
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px;
+}
+
+.date-detail {
+  margin: 0 8px;
+  font-size: small;
+}
+
 .mail-container {
-  padding-left: 16px;
+  padding-left: 8px;
+  margin-top: 16px;
+  font-size: large;
+}
+
+.detail-container {
+  padding: 8px;
+  font-size: medium;
 }
 
 .tag {
@@ -80,11 +100,8 @@ watchEffect(async () => {
   margin-top: 8px;
 }
 
-.detail-container {
-  white-space: pre-line;
-}
-
 .todo-container:hover {
   background-color: #f4f9ff;
+  cursor : pointer;
 }
 </style>
