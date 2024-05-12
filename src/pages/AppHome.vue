@@ -27,15 +27,15 @@ watchEffect(async () => {
     <div class="todo-container" v-for="data, index in data" :key="index">
       <div class="tag-container">
         <div class="tag">チーム{{ data.team }}</div>
-        <div class="tag">{{ data.status }}</div>
-        <div class="tag">{{ data.pic }}</div>
         <div class="tag">{{ data.process }}</div>
+        <div class="tag">{{ data.pic }}</div>
+        <div class="tag">{{ data.status }}</div>
       </div>
       <div class="mail-container">
         <div class="mail-title">{{ data.subject }} </div>
         <div class="detail-container">{{ data.detail }}</div>
         <div class="date-container">
-          <div class="date-detail">{{data.date }}</div>
+          <div class="date-detail">更新日：{{data.date }}</div>
           <div class="date-detail">〇日前</div>
         </div>
       </div>
