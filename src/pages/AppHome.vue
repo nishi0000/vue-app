@@ -1,17 +1,27 @@
 <script setup>
 import { ref, watchEffect } from 'vue';
 import { db } from "../firebase_settings/index.js";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs,query,orderBy } from "firebase/firestore";
 
 const loading = ref(true);
-const data = ref([])
+const mailContent = ref([]);
+const mailId = ref([]);
+
 // ドキュメントを取得して表示
 watchEffect(async () => {
-  const querySnapshot = await getDocs(collection(db, "todo"));
-  data.value = querySnapshot.docs.map(doc => doc.data());
-  console.log(data.value)
+  const dataRef = collection(db, "todo");  
+  const q = await query(dataRef, orderBy("date", "desc"));
+  const querySnapshot = await getDocs(q);
+
+  // ドキュメントのIDを取得
+  mailId.value = querySnapshot.docs.map(doc => doc.id);
+
+  // ドキュメントのデータを取得
+  mailContent.value = querySnapshot.docs.map(doc => doc.data());
+  console.log(mailContent.value)
   loading.value = false
-})
+});
+
 </script>
 
 <template>
@@ -24,7 +34,7 @@ watchEffect(async () => {
 
     <div v-if="loading">Loading...</div>
 
-    <div class="todo-container" v-for="data, index in data" :key="index">
+    <div class="todo-container" v-for="data, index in mailContent" :key="index" @click="$router.push(`mail/${mailId[index]}`)">
       <div class="tag-container">
         <div class="tag">チーム{{ data.team }}</div>
         <div class="tag">{{ data.process }}</div>
@@ -62,9 +72,22 @@ watchEffect(async () => {
   width: 800px;
 }
 
+
+.todo-container:hover {
+  background-color: #f4f9ff;
+  cursor : pointer;
+}
+
 .tag-container {
   display: flex;
   gap: 8px;
+}
+
+.tag {
+  font-size: small;
+  padding: 4px 8px;
+  border: 1px solid gray;
+  border-radius: 8px;
 }
 
 .date-container {  
@@ -84,24 +107,14 @@ watchEffect(async () => {
   font-size: large;
 }
 
-.detail-container {
-  padding: 8px;
-  font-size: medium;
-}
-
-.tag {
-  font-size: small;
-  padding: 4px 8px;
-  border: 1px solid gray;
-  border-radius: 8px;
-}
 
 .mail-title {
   margin-top: 8px;
 }
 
-.todo-container:hover {
-  background-color: #f4f9ff;
-  cursor : pointer;
+.detail-container {
+  padding: 8px;
+  font-size: medium;
 }
+
 </style>
