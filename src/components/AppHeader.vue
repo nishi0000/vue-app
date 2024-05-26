@@ -78,15 +78,6 @@ const onClickModalWindow = () => {
           alt="ホームアイコン"
         />
       </RouterLink>
-      <RouterLink :to="`/about`">
-        <img
-          class="iconimage"
-          src="../images/breadadd.png"
-          @mouseover="() => mouseOver('テスト')"
-          @mouseleave="() => mouseOver('')"
-          alt="設定アイコン"
-        />
-      </RouterLink>
       <RouterLink :to="`/createtodo`">
         <img
           class="iconimage"

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watchEffect } from 'vue';
 import { db } from "../firebase_settings/index.js";
-import { collection, getDocs,query,orderBy } from "firebase/firestore";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
 const loading = ref(true);
 const mailContent = ref([]);
@@ -9,8 +9,8 @@ const mailId = ref([]);
 
 // ドキュメントを取得して表示
 watchEffect(async () => {
-  const dataRef = collection(db, "todo");  
-  const q = await query(dataRef, orderBy("date", "desc"));
+  const dataRef = collection(db, "todo");
+  const q = await query(dataRef, orderBy("timestamp", "desc"));
   const querySnapshot = await getDocs(q);
 
   // ドキュメントのIDを取得
@@ -34,7 +34,8 @@ watchEffect(async () => {
 
     <div v-if="loading">Loading...</div>
 
-    <div class="todo-container" v-for="data, index in mailContent" :key="index" @click="$router.push(`mail/${mailId[index]}`)">
+    <div class="todo-container" v-for="data, index in mailContent" :key="index"
+      @click="$router.push(`mail/${mailId[index]}`)">
       <div class="tag-container">
         <div class="tag">チーム{{ data.team }}</div>
         <div class="tag">{{ data.process }}</div>
@@ -45,7 +46,8 @@ watchEffect(async () => {
         <div class="mail-title">{{ data.subject }} </div>
         <div class="detail-container">{{ data.detail }}</div>
         <div class="date-container">
-          <div class="date-detail">更新日：{{data.date }}</div>
+          <div class="date-detail">問い合わせ日時：{{ data.date }}</div>
+          <div class="date-detail">更新日：{{ data.date }}</div>
           <div class="date-detail">〇日前</div>
         </div>
       </div>
@@ -67,15 +69,20 @@ watchEffect(async () => {
 
 .todo-container {
   /* background-color: aqua; */
-  margin: 12px auto;
+  margin: 24px auto;
   padding: 12px;
   width: 800px;
+  border-radius: 8px;
+  border: solid 1px gray;
+  box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.12);
+  transition: transform 0.1s ease;
 }
 
 
 .todo-container:hover {
   background-color: #f4f9ff;
-  cursor : pointer;
+  cursor: pointer;
+  transform: translate(1px, 1px);
 }
 
 .tag-container {
@@ -90,7 +97,7 @@ watchEffect(async () => {
   border-radius: 8px;
 }
 
-.date-container {  
+.date-container {
   display: flex;
   justify-content: flex-end;
   margin: 8px;
@@ -116,5 +123,4 @@ watchEffect(async () => {
   padding: 8px;
   font-size: medium;
 }
-
 </style>
