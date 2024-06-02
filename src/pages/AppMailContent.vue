@@ -109,6 +109,17 @@ watchEffect(async () => {
     margin: 8px;
 }
 
+.todo-container {
+  /* background-color: aqua; */
+  margin: 24px auto;
+  padding: 12px;
+  width: 800px;
+  border-radius: 8px;
+  border: solid 1px gray;
+  box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.12);
+  transition: transform 0.1s ease;
+}
+
 .date-detail {
     margin: 0 8px;
     font-size: small;
