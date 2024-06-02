@@ -1,15 +1,12 @@
 <script setup>
 import { ref, watchEffect } from 'vue';
 import { db } from "../firebase_settings/index.js";
-import { useRoute,useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { doc, getDoc } from "firebase/firestore";
-import AppButton from "../components/AppButton.vue";
-
 
 const loading = ref(true);
 const mailContent = ref([]);
 const route = useRoute();
-const router = useRouter();
 
 // ドキュメントを取得して表示
 watchEffect(async () => {
@@ -21,12 +18,6 @@ watchEffect(async () => {
     console.log(querySnapshot.data());
     loading.value = false;
 });
-
-const onClickPost = async () => {
-
-
-  router.push(`/`);
-};
 
 </script>
 
@@ -73,9 +64,7 @@ const onClickPost = async () => {
             </div>
         </div>
 
-        <div class="button-container">
-      <AppButton :onClick="onClickPost">送信</AppButton>
-    </div>
+
         <br />
         <br />
         <br /> <br /> <br /> <br /> <br /> <br />
@@ -91,8 +80,6 @@ const onClickPost = async () => {
 
 .todo-container {
     /* background-color: aqua; */
-    border:solid 1px gray;
-    border-radius: 8px;
     margin: 12px auto;
     padding: 12px;
     width: 800px;
@@ -102,7 +89,6 @@ const onClickPost = async () => {
 .todo-container:hover {
     background-color: #f4f9ff;
     cursor: pointer;
-    transform: translate(1px, 1px);
 }
 
 .tag-container {
@@ -121,6 +107,17 @@ const onClickPost = async () => {
     display: flex;
     justify-content: flex-end;
     margin: 8px;
+}
+
+.todo-container {
+  /* background-color: aqua; */
+  margin: 24px auto;
+  padding: 12px;
+  width: 800px;
+  border-radius: 8px;
+  border: solid 1px gray;
+  box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.12);
+  transition: transform 0.1s ease;
 }
 
 .date-detail {
@@ -162,10 +159,5 @@ textarea {
 
 .radio {
     margin-left: 16px;
-}
-
-.button-container {
-  margin-top: 18px;
-  text-align: center;
 }
 </style>

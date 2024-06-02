@@ -5,7 +5,6 @@ import { db } from "../firebase_settings/index.js";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import AppButton from "../components/AppButton.vue";
 
-
 const subject = ref("");
 const date = ref("");
 const team = ref("");
