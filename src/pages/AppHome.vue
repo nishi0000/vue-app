@@ -1,16 +1,19 @@
 <script setup>
 import { ref, watchEffect } from 'vue';
 import { db } from "../firebase_settings/index.js";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, query, orderBy,deleteDoc,doc } from "firebase/firestore";
+import AppModalWindow from "../components/AppModalWindow.vue";
 
 const loading = ref(true);
 const mailContent = ref([]);
 const mailId = ref([]);
+const modalOpen = ref(false);
+const deleteMailId = ref("");
 
 // ドキュメントを取得して表示
 watchEffect(async () => {
   const dataRef = collection(db, "todo");
-  const q = await query(dataRef, orderBy("timestamp", "desc"));
+  const q = query(dataRef, orderBy("timestamp", "desc"));
   const querySnapshot = await getDocs(q);
 
   // ドキュメントのIDを取得
@@ -18,9 +21,57 @@ watchEffect(async () => {
 
   // ドキュメントのデータを取得
   mailContent.value = querySnapshot.docs.map(doc => doc.data());
-  console.log(mailContent.value)
-  loading.value = false
+  console.log(mailContent.value);
+  loading.value = false;
 });
+
+const onClickEdit = (event) => {
+  event.stopPropagation();
+
+}
+
+const onClickModalOpen = (event,id) => {
+  event.stopPropagation();
+  modalOpen.value = true;
+  deleteMailId.value = id;
+}
+
+const deleteDocumentAndSubcollections = async (docRef) => {
+  const subcollectionsSnapshot = await getDocs(collection(docRef, 'post')); // サブコレクション名を指定
+  const deletePromises = [];
+
+  subcollectionsSnapshot.forEach((subDoc) => {
+    deletePromises.push(deleteDocumentAndSubcollections(doc(db, `${docRef.path}/post`, subDoc.id)));
+  });
+
+  deletePromises.push(deleteDoc(docRef));
+
+  await Promise.all(deletePromises);
+}
+
+const onClickDelete = async() =>{
+
+  if (deleteMailId.value) {
+    const docRef = doc(db, "todo", deleteMailId.value);
+    await deleteDocumentAndSubcollections(docRef);
+
+    // ドキュメントとサブコレクションの削除後、データを再取得
+    const dataRef = collection(db, "todo");
+    const q = query(dataRef, orderBy("timestamp", "desc"));
+    const querySnapshot = await getDocs(q);
+
+    // ドキュメントのIDを取得
+    mailId.value = querySnapshot.docs.map(doc => doc.id);
+
+    // ドキュメントのデータを取得
+    mailContent.value = querySnapshot.docs.map(doc => doc.data());
+    console.log(mailContent.value);
+    loading.value = false;
+  }
+  modalOpen.value = false;
+  deleteMailId.value = "";
+
+}
 
 </script>
 
@@ -36,12 +87,19 @@ watchEffect(async () => {
 
     <div class="todo-container" v-for="data, index in mailContent" :key="index"
       @click="$router.push(`mail/${mailId[index]}`)">
-      <div class="tag-container">
-        <div class="tag">チーム{{ data.team }}</div>
-        <div class="tag">{{ data.process }}</div>
-        <div class="tag">{{ data.pic }}</div>
-        <div class="tag">{{ data.status }}</div>
-      </div>
+      <div class="header-container">
+                <div class="tag-container">
+                    <div class="tag">チーム{{ data.team }}</div>
+                    <div class="tag">{{ data.process }}</div>
+                    <div class="tag">{{ data.pic }}</div>
+                    <div class="tag">{{ data.status }}</div>
+                </div>
+                <div>
+                    <img class="iconimage" src="../images/pen.png" alt="編集アイコン" @click="onClickEdit"/>
+                    <img class="iconimage" src="../images/delete.png" alt="削除アイコン" @click="event => onClickModalOpen(event,mailId[index])"/>
+                </div>
+                
+            </div>
       <div class="mail-container">
         <div class="mail-title">{{ data.subject }} </div>
         <div class="detail-container">{{ data.detail }}</div>
@@ -57,6 +115,12 @@ watchEffect(async () => {
     <br />
     <br />
     <br /> <br /> <br /> <br /> <br /> <br />
+    <AppModalWindow
+      v-if="modalOpen"
+      :onClickYes="onClickDelete"
+      :onClickNo="() => modalOpen = false"
+      >削除しますか？</AppModalWindow
+    >
   </main>
 </template>
 
@@ -85,6 +149,11 @@ watchEffect(async () => {
   transform: translate(1px, 1px);
 }
 
+.header-container {
+    display: flex;
+    justify-content: space-between;
+}
+
 .tag-container {
   display: flex;
   gap: 8px;
@@ -95,6 +164,17 @@ watchEffect(async () => {
   padding: 4px 8px;
   border: 1px solid gray;
   border-radius: 8px;
+}
+
+.iconimage {
+    height: 20px;
+    margin-left: 12px;
+    transition: 0.1s;
+}
+
+.iconimage:hover {
+    cursor: pointer;
+    transform: translate(1px, 1px);
 }
 
 .date-container {

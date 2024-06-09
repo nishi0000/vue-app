@@ -2,22 +2,62 @@
 import { ref, watchEffect } from 'vue';
 import { db } from "../firebase_settings/index.js";
 import { useRoute } from 'vue-router';
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, addDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
+import AppButton from "../components/AppButton.vue";
 
-const loading = ref(true);
+const loadingDoc = ref(true);
+const loadingDocs = ref(true);
+const mailContentTop = ref([]);
 const mailContent = ref([]);
 const route = useRoute();
 
-// ドキュメントを取得して表示
+// データを取得して表示
 watchEffect(async () => {
     console.log(route.params.id);
     const querySnapshot = await getDoc(doc(db, `todo`, route.params.id));
 
-    // ドキュメントのデータを取得
-    mailContent.value = querySnapshot.data();
+    // トップのデータを取得
+    mailContentTop.value = querySnapshot.data();
     console.log(querySnapshot.data());
-    loading.value = false;
+    loadingDoc.value = false;
+
+    //レスを取得
+    // 'todo' コレクションの特定のドキュメントのリファレンスを取得
+    const parentDocRef = doc(db, 'todo', route.params.id);
+
+    // 特定のドキュメントの中の 'post' コレクションのリファレンスを取得
+    const postCollectionRef = collection(parentDocRef, 'post');
+
+    // 'post' コレクションからすべてのドキュメントを取得
+    const querySnapshot2 = await getDocs(postCollectionRef);
+    mailContent.value = querySnapshot2.docs.map(doc => doc.data());
+    console.log(querySnapshot2.docs.map(doc => doc.data()));
+
+    loadingDocs.value = false;
+
 });
+
+const onClickPost = async () => {
+    await addDoc(collection(doc(db, 'todo', `${route.params.id}`), `post`), {
+        detail: "助けてください。助けてください。助けてください。",
+        timestamp: serverTimestamp()
+    });
+
+    //レスを取得
+    // 'todo' コレクションの特定のドキュメントのリファレンスを取得
+    const parentDocRef = doc(db, 'todo', route.params.id);
+
+    // 特定のドキュメントの中の 'post' コレクションのリファレンスを取得
+    const postCollectionRef = collection(parentDocRef, 'post');
+
+    // 'post' コレクションからすべてのドキュメントを取得
+    const querySnapshot2 = await getDocs(postCollectionRef);
+    mailContent.value = querySnapshot2.docs.map(doc => doc.data());
+    console.log(querySnapshot2.docs.map(doc => doc.data()));
+
+    loadingDocs.value = false;
+
+}
 
 </script>
 
@@ -25,22 +65,43 @@ watchEffect(async () => {
     <main>
 
 
-        <div v-if="loading">Loading...</div>
+        <div v-if="loadingDoc">Loading...</div>
 
         <div class="todo-container">
-            <div class="tag-container">
-                <div class="tag">チーム{{ mailContent.team }}</div>
-                <div class="tag">{{ mailContent.process }}</div>
-                <div class="tag">{{ mailContent.pic }}</div>
-                <div class="tag">{{ mailContent.status }}</div>
+            <div class="header-container">
+                <div class="tag-container">
+                    <div class="tag">チーム{{ mailContentTop.team }}</div>
+                    <div class="tag">{{ mailContentTop.process }}</div>
+                    <div class="tag">{{ mailContentTop.pic }}</div>
+                    <div class="tag">{{ mailContentTop.status }}</div>
+                </div>
             </div>
+
             <div class="mail-container">
-                <div class="mail-title">{{ mailContent.subject }} </div>
-                <div class="detail-container">{{ mailContent.detail }}</div>
+                <div class="mail-title">{{ mailContentTop.subject }} </div>
+                <div class="detail-container">{{ mailContentTop.detail }}</div>
                 <div class="date-container">
-                    <div class="date-detail">更新日：{{ mailContent.date }}</div>
+                    <div class="date-detail">更新日：{{ mailContentTop.date }}</div>
                     <div class="date-detail">〇日前</div>
                 </div>
+            </div>
+        </div>
+
+
+        <div v-if="loadingDocs"></div>
+
+        <div class="todo-container" v-for="data, index in mailContent" :key="index">
+            <div class="mail-container">
+                <div class="detail-container">{{ data.detail }}</div>
+                <div class="date-container">
+                    <div class="date-detail"></div>
+                </div>
+                <div class="icon-container">
+                <div>
+                    <img class="iconimage" src="../images/pen.png" alt="編集アイコン" />
+                    <img class="iconimage" src="../images/delete.png" alt="削除アイコン" />
+                </div>
+            </div>
             </div>
         </div>
 
@@ -63,7 +124,9 @@ watchEffect(async () => {
                 </div>
             </div>
         </div>
-
+        <div>
+            <AppButton :onClick="onClickPost">送信</AppButton>
+        </div>
 
         <br />
         <br />
@@ -85,10 +148,9 @@ watchEffect(async () => {
     width: 800px;
 }
 
-
-.todo-container:hover {
-    background-color: #f4f9ff;
-    cursor: pointer;
+.header-container {
+    display: flex;
+    justify-content: space-between;
 }
 
 .tag-container {
@@ -103,6 +165,22 @@ watchEffect(async () => {
     border-radius: 8px;
 }
 
+.icon-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.iconimage {
+    height: 20px;
+    margin-left: 12px;
+    transition: 0.1s;
+}
+
+.iconimage:hover {
+    cursor: pointer;
+    transform: translate(1px, 1px);
+}
+
 .date-container {
     display: flex;
     justify-content: flex-end;
@@ -110,14 +188,14 @@ watchEffect(async () => {
 }
 
 .todo-container {
-  /* background-color: aqua; */
-  margin: 24px auto;
-  padding: 12px;
-  width: 800px;
-  border-radius: 8px;
-  border: solid 1px gray;
-  box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.12);
-  transition: transform 0.1s ease;
+    /* background-color: aqua; */
+    margin: 24px auto;
+    padding: 12px;
+    width: 800px;
+    border-radius: 8px;
+    border: solid 1px gray;
+    box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.12);
+    transition: transform 0.1s ease;
 }
 
 .date-detail {
