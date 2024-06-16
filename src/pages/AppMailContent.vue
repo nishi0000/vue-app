@@ -2,13 +2,15 @@
 import { ref, watchEffect } from 'vue';
 import { db } from "../firebase_settings/index.js";
 import { useRoute } from 'vue-router';
-import { doc, getDoc, addDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, addDoc, collection, getDocs, serverTimestamp, query, orderBy, updateDoc } from "firebase/firestore";
 import AppButton from "../components/AppButton.vue";
 
 const loadingDoc = ref(true);
 const loadingDocs = ref(true);
 const mailContentTop = ref([]);
 const mailContent = ref([]);
+const status = ref("未回答");
+const detail = ref("");
 const route = useRoute();
 
 // データを取得して表示
@@ -19,17 +21,18 @@ watchEffect(async () => {
     // トップのデータを取得
     mailContentTop.value = querySnapshot.data();
     console.log(querySnapshot.data());
+    mailContentTop.value.timestamp = formatTimestampToDate(mailContentTop.value.timestamp);
     loadingDoc.value = false;
 
     //レスを取得
-    // 'todo' コレクションの特定のドキュメントのリファレンスを取得
     const parentDocRef = doc(db, 'todo', route.params.id);
-
-    // 特定のドキュメントの中の 'post' コレクションのリファレンスを取得
     const postCollectionRef = collection(parentDocRef, 'post');
 
-    // 'post' コレクションからすべてのドキュメントを取得
-    const querySnapshot2 = await getDocs(postCollectionRef);
+    // 'post' コレクションを降順にクエリ
+    const postsQuery = query(postCollectionRef, orderBy('timestamp'));
+    const querySnapshot2 = await getDocs(postsQuery);
+
+    // データを取得
     mailContent.value = querySnapshot2.docs.map(doc => doc.data());
     console.log(querySnapshot2.docs.map(doc => doc.data()));
 
@@ -38,25 +41,49 @@ watchEffect(async () => {
 });
 
 const onClickPost = async () => {
+    // レスデータを追加
     await addDoc(collection(doc(db, 'todo', `${route.params.id}`), `post`), {
-        detail: "助けてください。助けてください。助けてください。",
-        timestamp: serverTimestamp()
+        detail: detail.value,
+        timestamp:serverTimestamp(),
     });
 
-    //レスを取得
-    // 'todo' コレクションの特定のドキュメントのリファレンスを取得
     const parentDocRef = doc(db, 'todo', route.params.id);
-
-    // 特定のドキュメントの中の 'post' コレクションのリファレンスを取得
     const postCollectionRef = collection(parentDocRef, 'post');
 
-    // 'post' コレクションからすべてのドキュメントを取得
-    const querySnapshot2 = await getDocs(postCollectionRef);
+    //ドキュメントを更新
+    await updateDoc(parentDocRef, 
+    {   status: status.value,
+        timestamp:serverTimestamp(),
+     });
+
+    //更新後、ドキュメントのデータを取得
+    const querySnapshot = await getDoc(doc(db, `todo`, route.params.id));
+
+    // トップのデータを取得
+    mailContentTop.value = querySnapshot.data();
+    console.log(querySnapshot.data());
+    mailContentTop.value.timestamp = formatTimestampToDate(mailContentTop.value.timestamp);
+    loadingDoc.value = false;
+
+    // 'post' コレクションを降順にクエリ
+    const postsQuery = query(postCollectionRef, orderBy('timestamp'));
+    const querySnapshot2 = await getDocs(postsQuery);
+
+    // データを取得
     mailContent.value = querySnapshot2.docs.map(doc => doc.data());
     console.log(querySnapshot2.docs.map(doc => doc.data()));
 
     loadingDocs.value = false;
 
+}
+
+const formatTimestampToDate = (timestamp) => {
+    const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月は0から始まるので+1
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}/${month}/${day}`;
 }
 
 </script>
@@ -81,7 +108,7 @@ const onClickPost = async () => {
                 <div class="mail-title">{{ mailContentTop.subject }} </div>
                 <div class="detail-container">{{ mailContentTop.detail }}</div>
                 <div class="date-container">
-                    <div class="date-detail">更新日：{{ mailContentTop.date }}</div>
+                    <div class="date-detail">更新日：{{ mailContentTop.timestamp }}</div>
                     <div class="date-detail">〇日前</div>
                 </div>
             </div>
@@ -97,34 +124,34 @@ const onClickPost = async () => {
                     <div class="date-detail"></div>
                 </div>
                 <div class="icon-container">
-                <div>
-                    <img class="iconimage" src="../images/pen.png" alt="編集アイコン" />
-                    <img class="iconimage" src="../images/delete.png" alt="削除アイコン" />
+                    <div>
+                        <img class="iconimage" src="../images/pen.png" alt="編集アイコン" />
+                        <img class="iconimage" src="../images/delete.png" alt="削除アイコン" />
+                    </div>
                 </div>
-            </div>
             </div>
         </div>
 
         <div class="input-container">
 
-            <textarea></textarea>
+            <textarea v-model="detail"></textarea>
             <div class="radio-container">
                 <div>ステータス:</div>
                 <div class="radio">
-                    <input type="radio" name="team" value="A" v-model="team" />
-                    <label for="teamA">未回答</label>
+                    <input type="radio" name="status" value="未回答" v-model="status" />
+                    <label for="statusA">未回答</label>
                 </div>
                 <div class="radio">
-                    <input type="radio" name="team" value="B" v-model="team" />
-                    <label for="teamB">返事待ち</label>
+                    <input type="radio" name="status" value="返事待ち" v-model="status" />
+                    <label for="statusB">返事待ち</label>
                 </div>
                 <div class="radio">
-                    <input type="radio" name="team" value="C" v-model="team" />
-                    <label for="teamA">完了</label>
+                    <input type="radio" name="status" value="完了" v-model="status" />
+                    <label for="statusC">完了</label>
                 </div>
             </div>
         </div>
-        <div>
+        <div class="button-container">
             <AppButton :onClick="onClickPost">送信</AppButton>
         </div>
 
@@ -237,5 +264,10 @@ textarea {
 
 .radio {
     margin-left: 16px;
+}
+
+.button-container {
+    margin-top: 18px;
+    text-align: center;
 }
 </style>
